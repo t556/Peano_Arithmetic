@@ -1,0 +1,797 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\definecolor{codebg}{rgb}{0.95,0.95,0.92}
+\lstset{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!40!black},
+  numbers=left,
+  numberstyle=\tiny,
+  breaklines=true,
+  captionpos=b
+}
+
+\title{Hash Tables in C++: A Refresher for C Programmers with AS/CR Style}
+\author{Your Name}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Overview and Motivation}
+
+A \textbf{hash table} is a data structure that lets you store and retrieve key-value pairs in nearly constant time on average. If you’ve ever used a dictionary or an associative array, you’ve used something like a hash table.
+
+\subsection*{Why Are Hash Tables Important?}
+
+\begin{itemize}
+    \item Fast lookup: \(O(1)\) average case for insertion, deletion, and search.
+    \item Flexible: Can store almost anything if you define how to hash it.
+    \item Foundation for many abstractions: caches, symbol tables, compiler internals, network routing tables, etc.
+    \item Crucial for performance-oriented design—particularly important when building data-centric systems or modeling abstract relationships efficiently (e.g., graph traversal, sparse matrices).
+\end{itemize}
+
+\section*{Intuitive Analogy (CR Friendly)}
+
+Imagine you’re in a library where books are stored not by order, but by hashing the title into a number that tells you exactly which locker to open. If the locker is empty, place the book there. If there’s a collision (another book already in the locker), you have to handle it by some clever strategy.
+
+\subsection*{Key Insight: Hash Function + Array = Superpower}
+
+Hash tables are made of two simple parts:
+\begin{enumerate}
+    \item A \textbf{hash function} \( h(key) \): maps the key to an array index.
+    \item An \textbf{array} (a contiguous block of memory): stores key-value pairs at these indices.
+\end{enumerate}
+
+The power of a hash table lies in how cleverly you handle collisions and design your hash function.
+
+\section*{Struct Refresher (AS Foundation)}
+
+In C, a \texttt{struct} is a way to group variables (of possibly different types) under one name.
+
+\begin{lstlisting}[language=C++, caption={Basic struct definition in C-style}]
+struct Book {
+    int id;
+    const char* title;
+    float price;
+};
+\end{lstlisting}
+
+In C++, this becomes richer with constructors and methods.
+
+\begin{lstlisting}[language=C++, caption={C++ struct with constructor}]
+struct Book {
+    int id;
+    std::string title;
+    float price;
+
+    // Constructor
+    Book(int i, std::string t, float p) : id(i), title(t), price(p) {}
+};
+\end{lstlisting}
+
+You’ll see structs used in hash table nodes (e.g., key-value pairs).
+
+\section*{Pointers Refresher (CR-Style Insight)}
+
+Pointers let you reference memory locations directly, which is necessary when managing dynamic memory (especially with collision chains or rehashing).
+
+\begin{lstlisting}[language=C++, caption={Simple pointer usage}]
+int a = 10;
+int* ptr = &a;
+std::cout << *ptr; // Outputs 10
+\end{lstlisting}
+
+\textbf{Important}: In hash tables, we often use pointers to link items together (like in linked lists), or to allocate storage dynamically for flexible growth.
+
+\section*{Hash Table Components (AS Map)}
+
+\begin{itemize}
+    \item \textbf{Key}: What you're indexing by (e.g., name, number).
+    \item \textbf{Value}: What you're storing.
+    \item \textbf{Bucket}: The array slot where items get stored.
+    \item \textbf{Hash function}: Converts the key to an index.
+    \item \textbf{Collision resolution strategy}: What to do if two keys hash to the same index.
+\end{itemize}
+
+\subsection*{Common Collision Resolution Techniques}
+
+\begin{itemize}
+    \item \textbf{Chaining}: Each bucket holds a linked list (or dynamic array) of entries.
+    \item \textbf{Open addressing}: Look for the next available slot (e.g., linear probing, quadratic probing, double hashing).
+\end{itemize}
+
+\section*{Coming Up Next}
+
+In the next module, we'll build a minimal working hash table in C++ using:
+\begin{itemize}
+    \item Arrays of pointers to linked lists (for chaining).
+    \item A simple hash function for strings or integers.
+    \item Custom structs for key-value pairs.
+\end{itemize}
+
+\textbf{Preview}: You’ll build something like this:
+
+\begin{lstlisting}[language=C++]
+// HashTable
+//  |--- Bucket 0: NULL
+//  |--- Bucket 1: [ ("Alice", 100) -> ("Bob", 95) ]
+//  |--- Bucket 2: NULL
+//  |___ ...
+\end{lstlisting}
+
+\maketitle
+
+\section*{Design Overview}
+
+We will build a hash table that:
+\begin{itemize}
+    \item Stores \texttt{std::string} keys and \texttt{int} values.
+    \item Uses a basic hash function.
+    \item Uses \textbf{chaining} with linked lists to handle collisions.
+\end{itemize}
+
+\subsection*{High-Level Structure}
+
+\begin{itemize}
+    \item A fixed-size array of \texttt{Node*}, where each bucket is a pointer to the head of a linked list.
+    \item Each \texttt{Node} holds a key, value, and pointer to the next node.
+\end{itemize}
+
+\section*{Step 1: Define a Node Struct}
+
+\begin{lstlisting}[language=C++, caption={Struct for Linked List Node}]
+struct Node {
+    std::string key;
+    int value;
+    Node* next;
+
+    Node(std::string k, int v) : key(k), value(v), next(nullptr) {}
+};
+\end{lstlisting}
+
+\textbf{AS insight}: We're grouping key-value pairs with a next pointer to form a singly linked list.
+
+\textbf{CR insight}: This structure will allow us to "chain" multiple key-value pairs at the same array index if collisions occur.
+
+\section*{Step 2: Define the Hash Table Class}
+
+\begin{lstlisting}[language=C++, caption={Basic Hash Table Class Skeleton}]
+class HashTable {
+private:
+    static const int TABLE_SIZE = 10;
+    Node* table[TABLE_SIZE];
+
+    int hashFunction(std::string key);
+
+public:
+    HashTable();
+    ~HashTable();
+
+    void insert(std::string key, int value);
+    int search(std::string key);
+    void remove(std::string key);
+};
+\end{lstlisting}
+
+\section*{Step 3: Constructor and Destructor}
+
+\begin{lstlisting}[language=C++]
+HashTable::HashTable() {
+    for (int i = 0; i < TABLE_SIZE; ++i) {
+        table[i] = nullptr;
+    }
+}
+
+HashTable::~HashTable() {
+    for (int i = 0; i < TABLE_SIZE; ++i) {
+        Node* entry = table[i];
+        while (entry != nullptr) {
+            Node* prev = entry;
+            entry = entry->next;
+            delete prev;
+        }
+    }
+}
+\end{lstlisting}
+
+\textbf{Why do this?}
+
+\begin{itemize}
+    \item We initialize all buckets to \texttt{nullptr}.
+    \item In the destructor, we walk through each bucket and free any nodes. This avoids memory leaks.
+\end{itemize}
+
+\section*{Step 4: A Simple Hash Function}
+
+\begin{lstlisting}[language=C++, caption={Hash Function for Strings}]
+int HashTable::hashFunction(std::string key) {
+    int hash = 0;
+    for (char c : key) {
+        hash += c;
+    }
+    return hash % TABLE_SIZE;
+}
+\end{lstlisting}
+
+\textbf{Note}: This is a weak hash, but it works for small demos.
+
+\section*{Step 5: Insert Operation}
+
+\begin{lstlisting}[language=C++]
+void HashTable::insert(std::string key, int value) {
+    int index = hashFunction(key);
+    Node* newNode = new Node(key, value);
+    newNode->next = table[index];
+    table[index] = newNode;
+}
+\end{lstlisting}
+
+This adds the new node to the front of the list at \texttt{table[index]}.
+
+\section*{Step 6: Search Operation}
+
+\begin{lstlisting}[language=C++]
+int HashTable::search(std::string key) {
+    int index = hashFunction(key);
+    Node* entry = table[index];
+
+    while (entry != nullptr) {
+        if (entry->key == key) return entry->value;
+        entry = entry->next;
+    }
+    return -1; // Key not found
+}
+\end{lstlisting}
+
+\section*{Step 7: Remove Operation}
+
+\begin{lstlisting}[language=C++]
+void HashTable::remove(std::string key) {
+    int index = hashFunction(key);
+    Node* entry = table[index];
+    Node* prev = nullptr;
+
+    while (entry != nullptr && entry->key != key) {
+        prev = entry;
+        entry = entry->next;
+    }
+
+    if (entry == nullptr) return; // Not found
+
+    if (prev == nullptr) {
+        table[index] = entry->next; // Remove head
+    } else {
+        prev->next = entry->next;
+    }
+
+    delete entry;
+}
+\end{lstlisting}
+
+\section*{Test It All Together}
+
+\begin{lstlisting}[language=C++, caption={Main function to test the hash table}]
+int main() {
+    HashTable ht;
+    ht.insert("Alice", 100);
+    ht.insert("Bob", 95);
+    ht.insert("Charlie", 85);
+
+    std::cout << "Alice: " << ht.search("Alice") << std::endl;
+    std::cout << "Bob: " << ht.search("Bob") << std::endl;
+
+    ht.remove("Bob");
+    std::cout << "Bob after removal: " << ht.search("Bob") << std::endl;
+
+    return 0;
+}
+\end{lstlisting}
+
+\section*{CR Wrap-up: Hidden Powers}
+
+By understanding this structure, you now know how to:
+\begin{itemize}
+    \item Use linked data structures with dynamic memory.
+    \item Control memory layout and access.
+    \item Prepare for advanced modeling like sparse data graphs, lookup acceleration, or key-indexed maps.
+\end{itemize}
+
+\section*{Better Hash Functions}
+
+In Module 2, our hash function was:
+
+\begin{lstlisting}[language=C++]
+int hash = 0;
+for (char c : key) {
+    hash += c;
+}
+return hash % TABLE_SIZE;
+\end{lstlisting}
+
+\subsection*{Why it’s bad (AS/CR dual view):}
+\begin{itemize}
+    \item It treats permutations of characters the same (\texttt{"abc"} == \texttt{"cab"}).
+    \item It increases collision probability for short ASCII strings.
+    \item It doesn't scale well when `TABLE\_SIZE` increases.
+\end{itemize}
+
+\subsection*{Improved Version: DJB2 Hash}
+
+The DJB2 hash function is simple, fast, and surprisingly effective.
+
+\begin{lstlisting}[language=C++]
+unsigned long HashTable::hashFunction(std::string key) {
+    unsigned long hash = 5381;
+    for (char c : key) {
+        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    }
+    return hash % TABLE_SIZE;
+}
+\end{lstlisting}
+
+This gives better key distribution and sets you up for future hashing hardware-accelerated logic.
+
+\section*{Dynamic Resizing (a.k.a. Rehashing)}
+
+\textbf{Problem:} A fixed table size means eventual performance decay (more collisions, longer chains).
+
+\textbf{Solution:} Track the load factor \( \alpha = \frac{\text{num\_entries}}{\text{table\_size}} \). When \( \alpha > 0.75 \), double the size and rehash.
+
+\subsection*{Steps to Resize}
+\begin{enumerate}
+    \item Store the old table.
+    \item Allocate a new table (2x size).
+    \item Reinsert every key-value pair into the new table.
+    \item Free the old table.
+\end{enumerate}
+
+We’ll cover the implementation in a later advanced module to stay focused on concepts.
+
+\section*{Why \texttt{std::vector} is Your Friend}
+
+Instead of a fixed array:
+
+\begin{lstlisting}[language=C++]
+Node* table[TABLE_SIZE];
+\end{lstlisting}
+
+We use:
+
+\begin{lstlisting}[language=C++]
+std::vector<Node*> table;
+\end{lstlisting}
+
+Advantages:
+\begin{itemize}
+    \item Auto-resizing (with \texttt{resize()}).
+    \item Cleaner memory handling.
+    \item Essential for GPU-style data chunking (next section).
+\end{itemize}
+
+\subsection*{Update Constructor with Vector}
+\begin{lstlisting}[language=C++]
+HashTable::HashTable() {
+    table.resize(TABLE_SIZE, nullptr);
+}
+\end{lstlisting}
+
+\section*{Spatial Memory Intuition (CR Spatial Insight)}
+
+Your hash table’s bucket array is like a 1D grid in RAM. With \texttt{chaining}, each cell points to a mini list. In GPU terms:
+
+\begin{itemize}
+    \item The table is \textbf{device global memory}.
+    \item Each thread can operate on a disjoint bucket or chain.
+    \item All operations must respect memory access rules.
+\end{itemize}
+
+\textbf{CUDA Insight:} Buckets can be parallelized. Each block/thread gets:
+\begin{itemize}
+    \item A bucket index.
+    \item A pointer to walk through the chain.
+\end{itemize}
+
+This maps cleanly to warp-style access patterns.
+
+\section*{Designing with Parallelism in Mind}
+
+Even though we’re still in CPU-C++, it pays to design the interface so that:
+
+\begin{itemize}
+    \item Insertions/searches can occur in parallel buckets.
+    \item Hash functions are pure (no state/memory dependencies).
+    \item Data locality is improved (you’ll cache better).
+\end{itemize}
+
+\section*{Your New Optimized Table Class (Sketch)}
+
+\begin{lstlisting}[language=C++]
+class HashTable {
+private:
+    std::vector<Node*> table;
+    int size;
+
+    unsigned long hashFunction(std::string key);
+
+public:
+    HashTable(int tableSize = 10);
+    void insert(std::string key, int value);
+    int search(std::string key);
+    void remove(std::string key);
+};
+\end{lstlisting}
+
+\textbf{AS Parallel-Ready Abstraction:}
+\begin{itemize}
+    \item Input: key
+    \item Compute: index
+    \item Operate: on table[index] independently
+\end{itemize}
+
+\section*{Coming Up in Module 4}
+
+You’ll begin designing:
+\begin{itemize}
+    \item A rehashable, vectorized hash table.
+    \item Hooks for benchmarking insert/search speed.
+    \item A "simulated GPU kernel" for parallel insertions (emulated with threads or loops).
+\end{itemize}
+
+\textbf{Bonus:} We’ll preview how to port the core structure to a CUDA kernel-friendly format (e.g., SoA/CoA, global vs. shared memory constraints).
+
+\section*{Dynamic Resizing (a.k.a. Rehashing)}
+
+Your table should grow when too many items crowd into a small number of buckets (i.e., high load factor).
+
+\subsection*{When to Rehash?}
+Let:
+\[
+\alpha = \frac{\text{num\_elements}}{\text{table\_size}}
+\]
+Trigger rehash when \( \alpha > 0.75 \).
+
+\subsection*{Rehashing Steps}
+\begin{enumerate}
+    \item Save the old table.
+    \item Create a new table with size = \(2 \times \) old size.
+    \item Reinsert each element.
+    \item Delete old nodes to avoid memory leaks.
+\end{enumerate}
+
+\section*{Implementation Details}
+
+New member variables:
+
+\begin{lstlisting}[language=C++]
+int capacity;       // total slots
+int count;          // total elements
+\end{lstlisting}
+
+Add this to `insert()`:
+
+\begin{lstlisting}[language=C++]
+if ((float)count / capacity > 0.75) {
+    rehash();
+}
+\end{lstlisting}
+
+Rehash implementation:
+
+\begin{lstlisting}[language=C++]
+void HashTable::rehash() {
+    int old_capacity = capacity;
+    std::vector<Node*> old_table = table;
+
+    capacity *= 2;
+    table.clear();
+    table.resize(capacity, nullptr);
+    count = 0;
+
+    for (int i = 0; i < old_capacity; ++i) {
+        Node* entry = old_table[i];
+        while (entry) {
+            insert(entry->key, entry->value); // reinsert into new table
+            Node* prev = entry;
+            entry = entry->next;
+            delete prev;
+        }
+    }
+}
+\end{lstlisting}
+
+\textbf{Note:} We avoid directly copying pointers—this preserves hashing consistency with the new size.
+
+\section*{Performance Measurement Hooks}
+
+Use the standard C++ `<chrono>` library:
+
+\begin{lstlisting}[language=C++]
+#include <chrono>
+
+auto start = std::chrono::high_resolution_clock::now();
+
+// Perform insertions/searches
+
+auto end = std::chrono::high_resolution_clock::now();
+std::chrono::duration<double> duration = end - start;
+std::cout << "Time: " << duration.count() << "s\n";
+\end{lstlisting}
+
+This gives you fine-grained timing for benchmarking insert/search.
+
+\section*{Simulating Parallelism (Pre-CUDA Mental Model)}
+
+Imagine multiple threads inserting into the hash table. What happens?
+
+\textbf{Challenge:} Two threads inserting into the same bucket may cause race conditions.
+
+\subsection*{CR Insight: Lockless Chaining Design}
+A CUDA-friendly design requires:
+
+\begin{itemize}
+    \item Preallocated node storage (pool).
+    \item Atomic inserts (e.g., lock-free append).
+    \item Per-bucket synchronization (e.g., fine-grained locks or atomics).
+\end{itemize}
+
+\textbf{CPU Emulation Idea:}
+
+Use `std::thread` to simulate parallel insertions:
+
+\begin{lstlisting}[language=C++]
+void threadedInsert(HashTable* ht, std::string key, int val) {
+    ht->insert(key, val);
+}
+
+std::thread t1(threadedInsert, &ht, "Alice", 100);
+std::thread t2(threadedInsert, &ht, "Bob", 200);
+
+t1.join();
+t2.join();
+\end{lstlisting}
+
+\textbf{BUT:} You must add locks around `insert()` if you do this!
+
+\section*{Preparing for GPU-Style Design (Preview)}
+
+On a GPU:
+\begin{itemize}
+    \item Buckets must be stored in device memory.
+    \item Each thread gets a bucket index (e.g., via hash).
+    \item You’ll need:
+        \begin{itemize}
+            \item Flat memory representation (no pointers).
+            \item Atomic memory ops (e.g., \texttt{atomicCAS}).
+        \end{itemize}
+\end{itemize}
+
+\subsection*{CR Anticipation: SoA vs. AoS}
+
+Instead of:
+\begin{lstlisting}[language=C++]
+struct Node { string key; int val; Node* next; };
+\end{lstlisting}
+
+Think:
+\begin{itemize}
+    \item \texttt{keys[]}, \texttt{values[]}, \texttt{next\_index[]} $\rightarrow$ Structure of Arrays (SoA)
+\end{itemize}
+
+This lets you parallelize better in CUDA (coalesced memory access).
+
+\section*{Coming in Module 5:}
+
+We’ll finalize the full optimized C++ version with:
+\begin{itemize}
+    \item Rehashable vectorized table
+    \item Benchmark CLI interface
+    \item Final project file layout
+    \item Then start CUDA-friendly architectural planning!
+\end{itemize}
+
+\section*{Final Hash Table Class: Overview}
+
+\begin{itemize}
+    \item Fully dynamic and rehashable
+    \item Uses \texttt{std::vector} for bucket array
+    \item Benchmarked via \texttt{std::chrono}
+    \item Structurally sound for CUDA-style refactoring
+\end{itemize}
+
+\section*{Header File: hash\_table.hpp}
+
+\begin{lstlisting}[language=C++]
+#pragma once
+#include <vector>
+#include <string>
+
+struct Node {
+    std::string key;
+    int value;
+    Node* next;
+    Node(std::string k, int v) : key(k), value(v), next(nullptr) {}
+};
+
+class HashTable {
+private:
+    std::vector<Node*> table;
+    int capacity;
+    int count;
+
+    unsigned long hashFunction(std::string key);
+    void rehash();
+
+public:
+    HashTable(int initialSize = 10);
+    ~HashTable();
+
+    void insert(std::string key, int value);
+    int search(std::string key);
+    void remove(std::string key);
+};
+\end{lstlisting}
+
+\section*{Implementation File: hash\_table.cpp}
+
+\begin{lstlisting}[language=C++]
+#include "hash_table.hpp"
+#include <iostream>
+
+HashTable::HashTable(int initialSize) : capacity(initialSize), count(0) {
+    table.resize(capacity, nullptr);
+}
+
+HashTable::~HashTable() {
+    for (int i = 0; i < capacity; ++i) {
+        Node* entry = table[i];
+        while (entry) {
+            Node* prev = entry;
+            entry = entry->next;
+            delete prev;
+        }
+    }
+}
+
+unsigned long HashTable::hashFunction(std::string key) {
+    unsigned long hash = 5381;
+    for (char c : key)
+        hash = ((hash << 5) + hash) + c;
+    return hash % capacity;
+}
+
+void HashTable::rehash() {
+    int old_capacity = capacity;
+    std::vector<Node*> old_table = table;
+
+    capacity *= 2;
+    table.clear();
+    table.resize(capacity, nullptr);
+    count = 0;
+
+    for (int i = 0; i < old_capacity; ++i) {
+        Node* entry = old_table[i];
+        while (entry) {
+            insert(entry->key, entry->value);
+            Node* prev = entry;
+            entry = entry->next;
+            delete prev;
+        }
+    }
+}
+
+void HashTable::insert(std::string key, int value) {
+    if ((float)count / capacity > 0.75)
+        rehash();
+
+    int index = hashFunction(key);
+    Node* newNode = new Node(key, value);
+    newNode->next = table[index];
+    table[index] = newNode;
+    ++count;
+}
+
+int HashTable::search(std::string key) {
+    int index = hashFunction(key);
+    Node* entry = table[index];
+    while (entry) {
+        if (entry->key == key)
+            return entry->value;
+        entry = entry->next;
+    }
+    return -1;
+}
+
+void HashTable::remove(std::string key) {
+    int index = hashFunction(key);
+    Node* entry = table[index];
+    Node* prev = nullptr;
+
+    while (entry && entry->key != key) {
+        prev = entry;
+        entry = entry->next;
+    }
+
+    if (!entry) return;
+
+    if (!prev) table[index] = entry->next;
+    else prev->next = entry->next;
+
+    delete entry;
+    --count;
+}
+\end{lstlisting}
+
+\section*{Benchmark File: main.cpp}
+
+\begin{lstlisting}[language=C++]
+#include "hash_table.hpp"
+#include <iostream>
+#include <chrono>
+
+int main() {
+    HashTable ht;
+    const int N = 10000;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < N; ++i) {
+        ht.insert("Key" + std::to_string(i), i);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> diff = end - start;
+    std::cout << "Inserted " << N << " items in " << diff.count() << " seconds.\n";
+
+    std::cout << "Search result for Key1234: " << ht.search("Key1234") << "\n";
+}
+\end{lstlisting}
+
+\section*{Project Structure}
+
+\begin{verbatim}
+hash_table_project/
+|--- hash_table.hpp
+|--- hash_table.cpp
+|--- main.cpp
+|__ Makefile (optional)
+\end{verbatim}
+
+\section*{Makefile (Optional)}
+
+\begin{lstlisting}[language=make]
+all:
+    g++ -std=c++17 -O2 main.cpp hash_table.cpp -o hash_table
+\end{lstlisting}
+
+\section*{Next Steps (Toward CUDA)}
+
+Now that your C++ base is solid, you’re ready to:
+\begin{itemize}
+    \item Flatten your data layout (SoA instead of pointers)
+    \item Preallocate all memory
+    \item Implement per-bucket insertions in threads
+    \item Use atomic primitives or warp-serial execution
+\end{itemize}
+
+\section*{Bonus Thought: Sparse Graphs and Algebraic Models}
+
+Your hash table could now easily:
+\begin{itemize}
+    \item Represent sparse graphs (edges as keys, weights as values)
+    \item Store fast-access memoization results for recurrence relations
+    \item Index elements by prime-factor "key" patterns
+\end{itemize}
+
+This opens the door to using hash maps in symbolic computation, parallel dataflow models, or even algebraic DSLs you design yourself.
+
+
+\end{document}

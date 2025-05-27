@@ -1,0 +1,118 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Assignment: Abstract Math in C++ for AI \& Performance Systems}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Overview}
+This curriculum introduces math-rich ideas while progressively developing your C++ skills. Each stage reinforces learning through proofs, linear algebra, and practical modeling. Bonus “black diamond” challenges push the boundaries on performance and parallelization.
+
+\section{Stage 1: Class and Function Synthesis --- Mathematical Objects in Code}
+\subsection*{Theme: Modeling Abstract Math Concepts}
+
+\subsubsection*{Project 1: Peano Arithmetic Synthesizer}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Implement natural numbers using the Peano axioms (Zero, Successor).
+    \item \textbf{Part 1:} Write a function-based model of addition and multiplication using recursion.
+    \item \textbf{Part 2:} Develop a \texttt{PeanoNumber} class with operator overloads.
+    \item \textbf{Bonus:} Use compile-time recursion with \texttt{constexpr} (template metaprogramming preview).
+    \item \textbf{Rationale:} Reinforces recursion and inductive thinking (directly related to \emph{How to Prove It}).
+\end{itemize}
+
+\subsubsection*{Project 2: Vector Space Playground}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Implement a minimal vector space class for 2D/3D.
+    \item \textbf{Part 1:} Define a \texttt{Vector} class with dot product, scalar multiplication, and magnitude.
+    \item \textbf{Part 2:} Enforce axioms via function contracts/assertions.
+    \item \textbf{Part 3:} Implement transformations such as projection and extraction of orthogonal components.
+    \item \textbf{Bonus:} Optimize the \texttt{dot()} function for float vectors using SIMD.
+\end{itemize}
+
+\section{Stage 2: Templates, Overloads, and Abstraction --- Building Generic Math Libraries}
+\subsubsection*{Project 3: Template Matrix Library ($\mathbb{R}^n$)}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Build a templated \texttt{Matrix<T, Rows, Cols>} class.
+    \item \textbf{Part 1:} Implement basic operations: addition, scalar multiplication, and transpose.
+    \item \textbf{Part 2:} Add support for operator overloading and slicing.
+    \item \textbf{Part 3:} Develop a Gaussian elimination function.
+    \item \textbf{Bonus:} Use \texttt{std::span} with alignment-aware storage and benchmark the performance.
+\end{itemize}
+
+\subsubsection*{Project 4: Symbolic Logic Expression Tree}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Parse and evaluate propositional logic formulas.
+    \item \textbf{Part 1:} Construct an \texttt{Expr} class hierarchy (including \texttt{And}, \texttt{Or}, \texttt{Not}, \texttt{Var}).
+    \item \textbf{Part 2:} Recursively evaluate expressions based on a truth assignment.
+    \item \textbf{Bonus:} Create a simplifier that applies De Morgan’s laws and eliminates double negations.
+\end{itemize}
+
+\section{Stage 3: Memory Management \& System Modeling --- Low-Level Behavior of Abstract Systems}
+\subsubsection*{Project 5: Markov Chain Simulator}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Model discrete Markov processes using dynamic memory (state machine).
+    \item \textbf{Part 1:} Develop a \texttt{State} class with transitions and associated probabilities.
+    \item \textbf{Part 2:} Implement Monte Carlo simulation of state transitions.
+    \item \textbf{Bonus:} Compare performance between \texttt{std::vector} and a custom arena allocator.
+\end{itemize}
+
+\subsubsection*{Project 6: Multivariate Function Optimizer (Gradient Descent)}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Implement a simple gradient descent system without autodiff.
+    \item \textbf{Part 1:} Design a \texttt{Function<T>} class with evaluation and gradient estimation.
+    \item \textbf{Part 2:} Optimize convex functions such as L2 and quadratic bowls.
+    \item \textbf{Bonus:} Use OpenMP to parallelize the gradient estimation.
+\end{itemize}
+
+\section{Stage 4: Advanced Structures, Algebraic Systems --- Encoding Deep Mathematical Objects}
+\subsubsection*{Project 7: Finite Field Arithmetic Library (GF(p))}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Build modular arithmetic types to facilitate polynomial math.
+    \item \textbf{Part 1:} Implement a \texttt{ModInt<p>} class with overloaded operators and the extended Euclidean algorithm.
+    \item \textbf{Part 2:} Add polynomial division and compute the GCD over GF(p).
+    \item \textbf{Bonus:} Integrate SIMD acceleration and lookup table optimizations.
+\end{itemize}
+
+\subsubsection*{Project 8: Hilbert Curve Encoder/Decoder}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Develop a 2D and 3D spatial locality-preserving indexer.
+    \item \textbf{Part 1:} Implement the recursive Hilbert curve algorithm from scratch.
+    \item \textbf{Part 2:} Encapsulate the solution in a \texttt{HilbertMapper} class with unit tests.
+    \item \textbf{Bonus:} Benchmark against a Z-order curve and explore cache-aware matrix block layouts.
+\end{itemize}
+
+\section{Stage 5: Probabilistic Modeling \& Inference --- Foundations of AI/ML in Systems Code}
+\subsubsection*{Project 9: Bayesian Coin Inference Engine}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Compute the posterior distribution of a coin's bias from observed flips.
+    \item \textbf{Part 1:} Develop a \texttt{BetaDistribution} class with appropriate update rules.
+    \item \textbf{Part 2:} Simulate updates and visualize convergence (export data as CSV).
+    \item \textbf{Bonus:} Implement a Monte Carlo sampler using the Box-Muller transform for noise modeling.
+\end{itemize}
+
+\subsubsection*{Project 10: Kernels \& RKHS Prototyper}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Goal:} Implement common kernel functions and compute the Gram matrix.
+    \item \textbf{Part 1:} Code Gaussian/RBF and polynomial kernels.
+    \item \textbf{Part 2:} Classify points in toy datasets using the computed kernels.
+    \item \textbf{Bonus:} SIMD-optimize the kernel matrix computation and measure its performance.
+\end{itemize}
+
+\section*{Optional Side Quests: Black Diamond Challenges}
+\begin{itemize}[leftmargin=*]
+    \item Write a unit test suite in pure C++.
+    \item Use OpenMP or \texttt{std::thread} to parallelize workloads.
+    \item Implement custom memory pools for allocation-heavy classes.
+    \item Add CSV logging/profiling hooks to track runtime performance.
+\end{itemize}
+
+\end{document}

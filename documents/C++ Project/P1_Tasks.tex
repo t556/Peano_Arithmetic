@@ -1,0 +1,140 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{listings}
+\lstset{language=C++,basicstyle=\ttfamily,breaklines=true}
+
+\title{Assignment: Peano Arithmetic Synthesizer \\ \small Inductive Math Modeling via Classes and Recursion}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Overview}
+This project challenges you to model natural numbers from scratch using Peano's axioms. Designed for learners who value logical rigor (Abstract Sequential) and creative problem-solving (Concrete Random), this assignment will guide you through:
+\begin{itemize}[leftmargin=*]
+    \item Analyzing underlying principles of inductive reasoning.
+    \item Constructing recursive data structures.
+    \item Implementing arithmetic operations using clear, logical steps.
+    \item Exploring creative performance enhancements.
+\end{itemize}
+
+\section{Underlying Principles and Compelling Reasons}
+\textbf{Why this project?}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Inductive Reasoning:} Understand how the Peano axioms underpin natural number arithmetic.
+    \item \textbf{Logical Analysis:} Break down complex ideas into base cases and inductive steps.
+    \item \textbf{Creative Exploration:} Experiment with alternative memory management strategies and performance benchmarking.
+    \item \textbf{Practical Application:} Bridge theoretical concepts with hands-on C++ coding.
+\end{itemize}
+
+\section{Tasks}
+
+\subsection*{Task 1: Define the Peano Axioms in English}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Objective:} Write down the Peano axioms for $\mathbb{N}$.
+    \item \textbf{Instructions:}
+    \begin{itemize}
+        \item Identify which statements serve as the base case(s) and which are inductive.
+        \item Provide logical reasoning for the structure of each axiom.
+    \end{itemize}
+    \item \textbf{Goal:} Solidify your understanding of how recursive structures form the basis of natural number arithmetic.
+\end{itemize}
+
+\subsection*{Task 2: Define a Recursive Struct for Natural Numbers}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Objective:} Create a basic \texttt{PeanoNumber} structure.
+    \item \textbf{Requirements:}
+    \begin{itemize}
+        \item A boolean flag \texttt{isZero} to indicate the base case.
+        \item A pointer to another \texttt{PeanoNumber} representing the successor.
+    \end{itemize}
+    \item \textbf{Implementation:}
+    \begin{itemize}
+        \item Write a constructor that initializes either a zero or a successor type.
+        \item Implement a \texttt{print()} method to display the integer value.
+    \end{itemize}
+    \item \textbf{Key Concepts:} Recursive data structures, pointer ownership, and proper object construction.
+\end{itemize}
+
+\subsection*{Task 3: Write a Recursive Addition Function}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Function Signature:} \texttt{PeanoNumber* add(PeanoNumber* a, PeanoNumber* b)}
+    \item \textbf{Recursive Definition:}
+    \[
+    \begin{aligned}
+    \texttt{add}(a, 0) &= a, \\
+    \texttt{add}(a, S(b)) &= S(\texttt{add}(a, b))
+    \end{aligned}
+    \]
+    \item \textbf{Test Case:} Add 2 and 3; use your \texttt{print()} method to verify the result.
+\end{itemize}
+
+\subsection*{Task 4: Implement Multiplication}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Function Signature:} \texttt{PeanoNumber* multiply(PeanoNumber* a, PeanoNumber* b)}
+    \item \textbf{Recursive Definition:}
+    \[
+    \begin{aligned}
+    \texttt{multiply}(a, 0) &= 0, \\
+    \texttt{multiply}(a, S(b)) &= \texttt{add}(a, \texttt{multiply}(a, b))
+    \end{aligned}
+    \]
+    \item \textbf{Test Case:} Multiply 2 and 3 to produce 6.
+\end{itemize}
+
+\subsection*{Task 5: Wrap in a Class with Operator Overloads}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Class Name:} \texttt{PeanoInt}
+    \item \textbf{Requirements:}
+    \begin{itemize}
+        \item Encapsulate an internal pointer to your recursive structure.
+        \item Implement a constructor that accepts an \texttt{int} and builds the corresponding Peano representation.
+        \item Provide a \texttt{toInt()} method to convert back to a native integer.
+        \item Overload operators: \texttt{+}, \texttt{*}, \texttt{==}, and the stream output operator (\texttt{\textless\textless}).
+    \end{itemize}
+    \item \textbf{Design Tips:}
+    \begin{itemize}
+        \item Use smart pointers (e.g., \texttt{std::shared\_ptr}) or implement a custom destructor to ensure proper memory management.
+        \item Guard against memory leaks to ensure robust performance.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Task 6: Test Your Class}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Implementation:} Write a \texttt{main()} function.
+    \item \textbf{Test Cases:}
+    \begin{itemize}
+        \item Validate that \texttt{2 + 3 = 5} and \texttt{2 * 3 = 6}.
+        \item Output results using \texttt{std::cout}.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Bonus Task: Compile-Time Peano Arithmetic}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Objective:} Explore template metaprogramming to encode Peano numbers at compile-time.
+    \item \textbf{Instructions:}
+    \begin{itemize}
+        \item Define \texttt{struct Zero \{\};} and \texttt{template <typename N> struct Succ \{\};}.
+        \item Implement \texttt{Add<A, B>::result} using \texttt{typedef}.
+    \end{itemize}
+    \item \textbf{Goal:} Gain insight into how compile-time logic can represent inductive reasoning, blending theory with practice.
+\end{itemize}
+
+\subsection*{Black Diamond: Performance / Systems Challenge}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Benchmarking:} Compare the performance of your Peano arithmetic operations with native integer operations.
+    \item \textbf{Optimization:}
+    \begin{itemize}
+        \item Implement a basic allocator for \texttt{PeanoNode} to reduce heap fragmentation.
+        \item Optionally, integrate a counter in each node to measure recursion depth and further analyze performance.
+    \end{itemize}
+\end{itemize}
+
+\end{document}

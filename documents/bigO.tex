@@ -1,0 +1,230 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\geometry{margin=1in}
+
+\title{Big-O Complexity Cheat Sheet: AS/CR Primer}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{ Common Big-O Complexities (AS Table)}
+
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Big-O} & \textbf{Growth Rate}        & \textbf{Example Pattern} \\
+\hline
+\( O(1) \)     & Constant                    & Accessing \texttt{arr[i]}, hash map lookup \\
+\( O(\log n) \) & Logarithmic                 & Binary search, tree traversal \\
+\( O(n) \)     & Linear                      & Single loop over array \\
+\( O(n \log n) \) & Linearithmic              & Merge sort, heap sort \\
+\( O(n^2) \)   & Quadratic                   & Nested loops, naive matrix mult \\
+\( O(2^n) \)   & Exponential                 & Recursive subset generation \\
+\( O(n!) \)    & Factorial                   & Permutations, TSP brute-force \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+\textbf{AS Tip:} Find loops and recursion — they’re your signal.  
+\textbf{CR Tip:} Use scaling intuition: \textit{“what happens if I double n?”}
+
+\section*{ How to Analyze Time Complexity (AS Steps)}
+
+\begin{enumerate}
+    \item Identify all loops and recursive calls.
+    \item Estimate how many times each will run.
+    \item Multiply nested operations.
+    \item Keep the most dominant term (drop constants).
+\end{enumerate}
+
+\vspace{1em}
+\textbf{Example:}
+\begin{lstlisting}[language=C++]
+for (int i = 0; i < n; i++)        // O(n)
+  for (int j = 0; j < n; j++)      // O(n)
+    doSomething();                 // O(1)
+\end{lstlisting}
+
+\textbf{Total: } \( O(n \times n) = O(n^2) \)
+
+\section*{ CR Memory Hooks}
+
+\begin{itemize}
+    \item \( O(1) \): Pick a card from the top — instant.
+    \item \( O(n) \): Flip through every page in a book.
+    \item \( O(\log n) \): Keep splitting a phone book in half.
+    \item \( O(n \log n) \): Sort a big deck by repeatedly merging halves.
+    \item \( O(n^2) \): Everyone shakes hands with everyone else.
+    \item \( O(2^n) \): Try every outfit combination from your wardrobe.
+\end{itemize}
+
+\section*{ Lower Bounds (Proven Limits)}
+
+Some operations are provably impossible to improve beyond a certain point.
+
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Task}                  & \textbf{Best Possible} & \textbf{Why} \\
+\hline
+Searching in unsorted array   & \( O(n) \)             & Must check all elements \\
+Searching in sorted array     & \( O(\log n) \)        & Binary search is optimal \\
+Comparison sorting            & \( O(n \log n) \)      & Proven lower bound \\
+Hash lookup (avg case)        & \( O(1) \)             & But worst-case \( O(n) \) \\
+Matrix multiplication         & \( O(n^{2.3729}) \)    & No \( O(n \log n) \) known \\
+Subset sum / TSP / SAT        & \( O(2^n) \)           & NP-complete; exponential only \\
+\hline
+\end{tabular}
+
+\section*{ CR Visualization: Scaling Impact}
+
+Assume an algorithm takes 1ms at \( n = 100 \).
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Complexity} & \textbf{Time at \( n = 10,000 \)} \\
+\hline
+\( O(1) \)           & 1ms \\
+\( O(\log n) \)      & ~2ms \\
+\( O(n) \)           & 100x → 100ms \\
+\( O(n \log n) \)    & ~132ms \\
+\( O(n^2) \)         & 10,000x → 10,000ms = 10s \\
+\( O(2^n) \)         & \textit{unimaginable} \\
+\hline
+\end{tabular}
+
+\section*{Tips for Choosing Algorithms}
+
+\begin{itemize}
+    \item Use \( O(1) \) or \( O(\log n) \) if data is indexed or sorted.
+    \item Aim for \( O(n) \) if you must read all items.
+    \item Accept \( O(n \log n) \) for sorting or divide-and-conquer.
+    \item Avoid \( O(n^2) \)+ unless \( n \leq 1000 \).
+    \item Avoid \( O(2^n) \)+ unless \( n \leq 20 \) or you're pruning search.
+\end{itemize}
+
+\section*{Final Rule of Thumb}
+
+If your algorithm is:
+
+\begin{itemize}
+    \item \( O(1) \) or \( O(\log n) \): \textbf{scales beautifully}
+    \item \( O(n) \) or \( O(n \log n) \): \textbf{usually safe}
+    \item \( O(n^2) \) or worse: \textbf{danger zone beyond 10,000 items}
+\end{itemize}
+
+\newpage
+
+\section*{Part 1 — Practice Problems}
+
+Estimate the **worst-case time complexity** in Big-O for each function below. Assume input size is \( n \).
+
+\vspace{1em}
+
+\textbf{1. Single loop}
+\begin{lstlisting}[language=C++]
+void func1(int n) {
+    for (int i = 0; i < n; ++i) {
+        std::cout << i;
+    }
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{2. Nested loop}
+\begin{lstlisting}[language=C++]
+void func2(int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            std::cout << i << j;
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{3. Logarithmic growth}
+\begin{lstlisting}[language=C++]
+void func3(int n) {
+    while (n > 1) {
+        n = n / 2;
+    }
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{4. Recursive Fibonacci (naive)}
+\begin{lstlisting}[language=C++]
+int fib(int n) {
+    if (n <= 1) return n;
+    return fib(n-1) + fib(n-2);
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{5. Merge sort-like pattern}
+\begin{lstlisting}[language=C++]
+void mergeSort(int arr[], int n) {
+    if (n <= 1) return;
+    int mid = n / 2;
+    mergeSort(arr, mid);
+    mergeSort(arr + mid, n - mid);
+    // merge step (assume linear time)
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{6. Two separate loops}
+\begin{lstlisting}[language=C++]
+void func6(int n) {
+    for (int i = 0; i < n; ++i)
+        std::cout << i;
+    for (int j = 0; j < n; ++j)
+        std::cout << j;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Part 2 — Answer Key and Explanations}
+
+\textbf{1. Single loop} — \fbox{\( O(n) \)}
+
+\textit{The loop runs exactly \( n \) times. Each step is \( O(1) \).}
+
+---
+
+\textbf{2. Nested loop} — \fbox{\( O(n^2) \)}
+
+\textit{Inner loop runs \( n \) times per outer loop. Total steps: \( n \times n \).}
+
+---
+
+\textbf{3. Logarithmic growth} — \fbox{\( O(\log n) \)}
+
+\textit{Each iteration halves \( n \). Number of steps is log base 2 of \( n \).}
+
+---
+
+\textbf{4. Recursive Fibonacci} — \fbox{\( O(2^n) \)}
+
+\textit{Two recursive calls per level, forms an exponential tree.}
+
+---
+
+\textbf{5. Merge sort} — \fbox{\( O(n \log n) \)}
+
+\textit{Divide: \( \log n \) levels; Merge: \( O(n) \) per level. Total: \( n \log n \).}
+
+---
+
+\textbf{6. Two separate loops} — \fbox{\( O(n) \)}
+
+\textit{First loop is \( O(n) \), second is \( O(n) \). Add them → still \( O(n) \).}
+
+
+
+\end{document}

@@ -1,0 +1,1243 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Peano Arithmetic and Incompleteness: A Guided Exploration}
+\author{Adapted and Annotated from Stephen Cook's CSC 438F/2404F Notes (2008)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section*{Preamble}
+\addcontentsline{toc}{section}{Preamble}
+
+This document is a guided, pedagogically optimized exploration of \textbf{Peano Arithmetic (PA)}, its foundational role in mathematical logic, and the implications of its \textbf{incompleteness} and \textbf{undecidability}. It is adapted from Stephen Cook's 2008 lecture notes and presented with detailed commentary and unpacking.
+
+\subsection*{Audience and Learning Profile}
+This is intended for curious learners with:
+\begin{itemize}
+  \item A first-year undergraduate background in mathematics, computer science, or logic
+  \item A strong preference for both \textbf{logical structure} (Abstract Sequential) and \textbf{creative experimentation} (Concrete Random)
+\end{itemize}
+
+\subsection*{Learning Style Alignment}
+This guide is structured to:
+\begin{itemize}
+  \item Present material in rigorous, layered progression: \textit{motivation} $\rightarrow$ \textit{formalism} $\rightarrow$ \textit{implications}
+  \item Embed explorations, what-if prompts, and edge-case analyses to support discovery-based understanding
+  \item Avoid oversimplification while scaffolding complex ideas clearly and carefully
+\end{itemize}
+
+\vspace{1em}
+
+\section{Motivation and Background}
+
+Peano Arithmetic (PA) is a formal theory intended to capture the properties of the natural numbers \(\mathbb{N}\) using first-order logic and a minimal set of arithmetic operations. But PA is not just a formalization: it is a deep window into the limits of logic itself.
+
+\subsection{Why Study PA?}
+
+There are three central motivations for studying Peano Arithmetic:
+
+\begin{enumerate}[label=\textbf{M\arabic*.}]
+  \item \textbf{Logical Foundations of Arithmetic:} PA is a precise framework in which to ask and answer questions about numbers, addition, multiplication, and induction.
+  
+  \item \textbf{Gödel's Incompleteness Theorems:} PA plays a starring role in the incompleteness results — famously, that any sound, consistent theory expressive enough to include PA cannot prove all truths about the natural numbers.
+  
+  \item \textbf{Formalization Power:} Despite its limitations, PA is strong enough to formalize essentially all known theorems of elementary number theory — including, according to some researchers, even Wiles’ proof of Fermat’s Last Theorem.
+\end{enumerate}
+
+\subsection{Historical Perspective}
+
+\begin{itemize}
+  \item In 1889, Giuseppe Peano introduced a set of axioms for the natural numbers. These are now known as the \textbf{Peano Postulates}.
+  \item In the 20th century, logicians sought to recast these postulates inside formal logic.
+  \item This led to the development of PA — a \textit{first-order axiomatic system} meant to capture the arithmetic of \(\mathbb{N}\).
+\end{itemize}
+
+\subsection{But Something Strange Happens...}
+
+PA is a powerful system — and yet, due to Gödel's Theorems, we know that:
+
+\begin{itemize}
+  \item PA is \textbf{incomplete} — there exist true arithmetic sentences that PA cannot prove.
+  \item PA cannot even prove its own \textbf{consistency}, if it is consistent.
+\end{itemize}
+
+This tension — between formal rigor and logical limits — is what makes the study of PA so intellectually rich.
+
+\subsection*{AS Learning Anchor: Layered Concept Map}
+
+\textbf{Peano Arithmetic (PA)} is:
+\begin{itemize}
+  \item A first-order theory over the language \( \mathcal{L}_A = \{0, s, +, \cdot; =\} \)
+  \item Built from axioms P1–P6 (next section) and an Induction Schema
+  \item Powerful enough to formalize arithmetic theorems
+  \item Provably incomplete and undecidable
+\end{itemize}
+
+\subsection*{CR Prompt: What If...}
+\textbf{What happens if we remove induction from PA?} Could the theory still prove anything useful? Spoiler: This leads us to a weaker system — Robinson Arithmetic (RA) — and a surprising window into undecidability. Stay tuned in Section 5.
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\section{The Peano Postulates (Set-Theoretic Form)}
+
+Let us begin with the classic, informal axioms for \(\mathbb{N}\), which serve as the foundation for all formal systems that model natural number arithmetic.
+
+\subsection{Set-Theoretic Formulation}
+
+Let \( N \) be a set with a distinguished element \( 0 \in N \), and a function \( S : N \to N \), called the \textbf{successor function}. The \textbf{Peano Postulates} are:
+
+\begin{description}
+  \item[GP1.] \( S(x) \neq 0 \), for all \( x \in N \)
+  \item[GP2.] \( S(x) = S(y) \Rightarrow x = y \), for all \( x, y \in N \)
+  \item[GP3.] Let \( A \subseteq N \) be such that:
+    \begin{itemize}
+      \item \( 0 \in A \)
+      \item \( x \in A \Rightarrow S(x) \in A \)
+    \end{itemize}
+    Then \( A = N \)
+\end{description}
+
+\vspace{0.5em}
+\textit{GP3 is the principle of mathematical induction.}
+
+\subsection{Implications of the Peano Postulates}
+
+Any two structures \( \langle N, 0, S \rangle \) and \( \langle N', 0', S' \rangle \) satisfying GP1–GP3 are \textbf{isomorphic}. That is, there exists a bijection \( \varphi : N \to N' \) such that:
+
+\[
+\varphi(0) = 0', \quad \varphi(S(x)) = S'(\varphi(x))
+\]
+
+\textbf{Interpretation:} These axioms uniquely characterize the structure of the natural numbers — up to isomorphism.
+
+\subsection*{CR Prompt: Can We Break the Rules?}
+
+What if we define a structure where \( S(x) = 0 \) for some \( x \)? Or where \( S(x) = S(y) \) but \( x \neq y \)? Try constructing such a toy universe. How do these violations break the idea of a ``natural number''?
+
+% Continued in next response
+\subsection{From Set Theory to First-Order Logic}
+
+While GP1–GP3 are powerful, they are formulated in the language of set theory. To work within a purely logical framework (e.g., first-order logic), we need to formalize these axioms in a more restricted setting.
+
+\textbf{Problem:} The induction axiom GP3 quantifies over all subsets of \( N \). But in first-order logic, we can’t quantify over sets — only over elements of the domain.
+
+\textbf{Solution:} We simulate subsets using formulas. That is, a formula \( A(x) \) is treated as the characteristic property of a set:
+\[
+\{ x \in N \mid A(x) \text{ is true} \}
+\]
+
+This leads to the \textbf{Induction Schema} in PA: a set of axioms, one for every formula \( A(x) \).
+
+\subsection{The Language of PA}
+
+We now define the first-order language used to formalize PA:
+
+\[
+\mathcal{L}_A = \{ 0, s, +, \cdot; = \}
+\]
+
+\begin{itemize}
+  \item \( 0 \): a constant symbol for the number zero
+  \item \( s \): a unary function symbol (successor)
+  \item \( + \): binary function symbol (addition)
+  \item \( \cdot \): binary function symbol (multiplication)
+  \item \( = \): binary relation symbol (equality)
+\end{itemize}
+
+\vspace{1em}
+\textbf{Important:} In this setup, the universe of discourse is assumed to be \( \mathbb{N} \), but this is not stated in the theory. The axioms define the intended structure.
+
+\subsection{Axioms of PA}
+
+We now introduce the axioms \( P1 \) through \( P6 \), along with the \textbf{Induction Schema}.
+
+\subsubsection*{Successor Axioms}
+
+\begin{description}
+  \item[P1.] \( \forall x\ (s(x) \neq 0) \)
+  \item[P2.] \( \forall x\ \forall y\ (s(x) = s(y) \rightarrow x = y) \)
+\end{description}
+
+\subsubsection*{Addition Axioms (Recursive Definition)}
+
+\begin{description}
+  \item[P3.] \( \forall x\ (x + 0 = x) \)
+  \item[P4.] \( \forall x\ \forall y\ (x + s(y) = s(x + y)) \)
+\end{description}
+
+\subsubsection*{Multiplication Axioms (Recursive Definition)}
+
+\begin{description}
+  \item[P5.] \( \forall x\ (x \cdot 0 = 0) \)
+  \item[P6.] \( \forall x\ \forall y\ (x \cdot s(y) = (x \cdot y) + x) \)
+\end{description}
+
+\subsubsection*{Induction Schema}
+
+Let \( A(x) \) be any formula in \( \mathcal{L}_A \) (possibly with parameters \( y_1, \dots, y_k \)). Then the axiom:
+
+\[
+\forall y_1 \cdots \forall y_k\ \left[(A(0) \wedge \forall x (A(x) \rightarrow A(s(x)))) \rightarrow \forall x A(x)\right]
+\]
+
+is part of PA. There is one such axiom for every formula \( A(x) \). This is not a single axiom, but an infinite family — hence a schema.
+
+\subsubsection*{Axiom Set Summary}
+
+Define:
+
+\[
+\Gamma_{PA} = \{ P1, P2, \dots, P6 \} \cup \{ \text{All Induction Axioms} \}
+\]
+
+Then PA is the set of all sentences provable from \( \Gamma_{PA} \). That is:
+
+\[
+PA = \{ A \in \Phi_0 \mid \Gamma_{PA} \vdash A \}
+\]
+
+\subsection*{AS Reflection: Hierarchy of PA}
+
+\begin{itemize}
+  \item \textbf{P1–P2:} Describe properties of the successor function
+  \item \textbf{P3–P4:} Define addition recursively
+  \item \textbf{P5–P6:} Define multiplication recursively
+  \item \textbf{Induction:} Captures the essence of natural number reasoning
+\end{itemize}
+
+\subsection*{CR Prompt: Schema vs. Axiom}
+
+\textbf{What if we replaced the entire Induction Schema with a single ``Induction Axiom''?}  
+Try constructing such an axiom. What goes wrong? (Hint: First-order logic can’t quantify over formulas!)
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\section{Examples: Formal Proofs in PA}
+
+To build comfort with reasoning inside PA, we now present some example theorems — starting with intuitive truths, then formalizing their derivations using only the axioms of PA.
+
+\subsection{Example 1: Every Nonzero Number Has a Predecessor}
+
+Let:
+\[
+A(x) := (x = 0) \vee (\exists y\ x = s(y))
+\]
+
+Claim: \( PA \vdash \forall x\ A(x) \)
+
+\textbf{Proof:} Use induction on \( x \).
+
+\begin{itemize}
+  \item \textbf{Base Case:} \( A(0) = (0 = 0) \vee (\exists y\ 0 = s(y)) \), which is true.
+  \item \textbf{Inductive Step:} Suppose \( A(x) \). Then \( A(s(x)) = (s(x) = 0) \vee (\exists y\ s(x) = s(y)) \)
+
+  Since \( s(x) \neq 0 \) (by P1), we must show \( \exists y\ s(x) = s(y) \), which holds with \( y = x \).
+\end{itemize}
+
+Thus, by the Induction Schema, we conclude:
+
+\[
+PA \vdash \forall x\ [(x = 0) \vee (\exists y\ x = s(y))]
+\]
+
+% Continued in next response
+\subsection{Example 2: Associativity of Addition}
+
+We will prove the following theorem:
+
+\[
+PA \vdash \forall x\ \forall y\ \forall z\ ((x + y) + z = x + (y + z))
+\]
+
+Let:
+\[
+A(z) := ((x + y) + z = x + (y + z))
+\]
+
+Note that \( A(z) \) is a formula with \textbf{free parameters} \( x \) and \( y \). We will apply the Induction Schema to \( A(z) \), treating \( x \) and \( y \) as constants.
+
+\subsubsection*{Step 1: Base Case}
+
+Prove:
+\[
+PA \vdash A(0) \quad \text{(i.e., } (x + y) + 0 = x + (y + 0) \text{)}
+\]
+
+\begin{align*}
+(x + y) + 0 &= x + y && \text{(by Axiom P3)} \\
+x + (y + 0) &= x + y && \text{(by Axiom P3)} \\
+\Rightarrow (x + y) + 0 &= x + (y + 0)
+\end{align*}
+
+\textbf{Conclusion:} \( A(0) \) is provable using P3.
+
+\subsubsection*{Step 2: Induction Step}
+
+Assume:
+\[
+PA \vdash A(z) \quad \text{(Inductive Hypothesis)}
+\]
+
+We must show:
+\[
+PA \vdash A(s(z)) \quad \text{(i.e., } (x + y) + s(z) = x + (y + s(z)) \text{)}
+\]
+
+\begin{align*}
+(x + y) + s(z) &= s((x + y) + z) && \text{(by Axiom P4)} \\
+               &= s(x + (y + z)) && \text{(by IH)} \\
+               &= x + s(y + z)   && \text{(by Axiom P4)} \\
+               &= x + (y + s(z)) && \text{(by Axiom P4)}
+\end{align*}
+
+Thus:
+\[
+(x + y) + s(z) = x + (y + s(z)) = A(s(z))
+\]
+
+\textbf{Conclusion:} The induction step is provable using P4 and the induction hypothesis.
+
+\subsubsection*{Final Conclusion}
+
+By the Induction Schema applied to \( A(z) \), we conclude:
+
+\[
+PA \vdash \forall z\ ((x + y) + z = x + (y + z))
+\]
+
+Since this holds for arbitrary \( x, y \), we generalize:
+
+\[
+PA \vdash \forall x\ \forall y\ \forall z\ ((x + y) + z = x + (y + z))
+\]
+
+\qed
+
+\subsection*{AS Anchor: Key Proof Strategy}
+
+\begin{itemize}
+  \item Define property \( A(z) \) with free parameters.
+  \item Prove \( A(0) \) directly from axioms.
+  \item Assume \( A(z) \) holds.
+  \item Prove \( A(s(z)) \) using the recursive definitions (P3–P4).
+  \item Apply the Induction Schema to generalize over all \( z \).
+\end{itemize}
+
+\subsection*{CR Prompt: Recursive Reasoning Play}
+
+Try proving the following using PA axioms and induction:
+
+\begin{enumerate}
+  \item Commutativity of addition: \( x + y = y + x \)
+  \item Associativity of multiplication: \( (x \cdot y) \cdot z = x \cdot (y \cdot z) \)
+  \item Distributivity: \( x \cdot (y + z) = x \cdot y + x \cdot z \)
+\end{enumerate}
+
+Which axioms are needed? Can you identify patterns or “hidden symmetries” that simplify the inductive steps?
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\section{Robinson Arithmetic (RA): A Finitely Axiomatized Subtheory of PA}
+
+\subsection{Motivation}
+
+PA is not finitely axiomatizable because of its Induction Schema — which includes an infinite family of axioms, one for each formula \( A(x) \).
+
+\textbf{Question:} What happens if we drop induction entirely?
+
+\textbf{Answer:} We get a weaker theory known as \textbf{Robinson Arithmetic (RA)}.
+
+\subsection{Definition of RA}
+
+RA uses the same language as PA:
+\[
+\mathcal{L}_A = \{0, s, +, \cdot; = \}
+\]
+
+Its axioms include:
+\[
+P1, P2, \dots, P6 \quad \text{(Same as in PA)}
+\]
+
+RA then adds three more axioms about the ordering relation \( \leq \), defined syntactically via:
+
+\[
+t_1 \leq t_2 \quad \text{stands for} \quad \exists z\ (t_1 + z = t_2)
+\]
+
+RA includes:
+
+\begin{description}
+  \item[P7.] \( \forall x\ (x \leq 0 \rightarrow x = 0) \)
+  \item[P8.] \( \forall x\ \forall y\ (x \leq s(y) \rightarrow (x \leq y \vee x = s(y))) \)
+  \item[P9.] \( \forall x\ \forall y\ (x \leq y \vee y \leq x) \)
+\end{description}
+
+\subsubsection*{Summary}
+
+\textbf{RA = } \( \{P1, \dots, P9\} \)
+
+\vspace{0.5em}
+\textbf{Important:} RA has no induction. That makes it finitely axiomatized — but much weaker than PA.
+
+\subsection*{AS Insight: Inclusion Relationship}
+
+\[
+RA \subset PA
+\]
+
+All axioms of RA are provable in PA using induction. But RA is weaker — yet still powerful enough to represent every \textbf{recursively enumerable (r.e.) relation}.
+
+\subsection*{CR Prompt: What Can RA Prove?}
+
+RA seems crippled without induction. And yet — it can prove surprising things. Try encoding simple computations (e.g., is a number even?) into RA’s language. How far can you get before hitting a wall?
+
+% Continued in next response
+\section{Representability and Undecidability in RA}
+
+\subsection{Representability of Relations}
+
+Let \( R(\vec{x}) \subseteq \mathbb{N}^n \) be an \( n \)-ary relation. We say a formula \( A(\vec{x}) \) \textbf{represents} \( R \) in a theory \( \Sigma \) if:
+
+\[
+\forall \vec{a} \in \mathbb{N}^n: \quad R(\vec{a}) \iff \Sigma \vdash A(s\vec{a})
+\]
+
+Where \( s\vec{a} \) denotes the encoding of natural number tuples using successor terms (e.g., \( 2 \rightarrow ss0 \)).
+
+\textbf{Interpretation:} The formula \( A \) “picks out” precisely the tuples in \( R \), via provability in \( \Sigma \).
+
+\subsection{Main Result: RA Representation Theorem}
+
+\textbf{Theorem:} Every recursively enumerable (r.e.) relation is representable in RA (and hence in every sound extension of RA) by a formula of the form \( \exists y\, \Delta_0 \).
+
+\begin{itemize}
+  \item \( \Delta_0 \): A bounded formula — all quantifiers are bounded (e.g., \( \forall x \leq t \), \( \exists x \leq t \))
+  \item \( \exists \Delta_0 \): Existential closure over such bounded formulas
+\end{itemize}
+
+\textbf{Key Implication:} RA can encode any computation that a Turing machine can semi-decide — even though RA lacks induction!
+
+\subsection{Proof Sketch}
+
+Let \( R(\vec{x}) \) be r.e. Then there exists a formula \( \exists y\, B(\vec{x}, y) \) such that:
+
+\[
+R(\vec{a}) \iff TA \vdash \exists y\, B(s\vec{a}, y)
+\]
+
+Using a key lemma (MAIN LEMMA) we will prove later, we can show that such \( \exists \Delta_0 \) formulas are also provable in RA whenever they are true in the standard model \( \mathbb{N} \).
+
+Thus:
+\[
+R(\vec{a}) \iff RA \vdash \exists y\, B(s\vec{a}, y)
+\]
+
+\qed
+
+\subsection{Corollary 1: Every Sound Extension of RA is Undecidable}
+
+\textbf{Proof:} Suppose \( \Sigma \) is a sound extension of RA. Let \( K = \{ e \mid \varphi_e(e) \downarrow \} \) be the standard halting set.
+
+Since \( K \) is r.e., it is representable in \( \Sigma \) by some formula \( A(x) \) with:
+
+\[
+a \in K \iff \Sigma \vdash A(sa)
+\]
+
+Define:
+\[
+f(a) = \#A(sa) \quad \text{(i.e., the Gödel number of the formula)}
+\]
+
+Then \( f \) is computable. Hence, membership in \( K \) reduces to theoremhood in \( \Sigma \). So if \( \Sigma \) were decidable, then \( K \) would be decidable — contradiction.
+
+\qed
+
+\subsection{Corollary 2: Church's Theorem}
+
+\textbf{Statement:} The set of valid sentences in the language \( \mathcal{L}_A \) is undecidable.
+
+\textbf{Proof:} Let \( RA = \{ P1, \dots, P9 \} \). Form the conjunction:
+
+\[
+\gamma = P1 \wedge P2 \wedge \dots \wedge P9
+\]
+
+Then:
+\[
+A \in RA \iff (\gamma \rightarrow A) \text{ is valid}
+\]
+
+So deciding validity would decide membership in RA, which is undecidable by Corollary 1.
+
+\qed
+
+\subsection*{AS Anchor: Summary of Logical Consequences}
+
+\begin{itemize}
+  \item \textbf{RA is finitely axiomatized} but can represent all r.e. relations.
+  \item \textbf{Any sound extension of RA is undecidable}.
+  \item \textbf{The set of valid sentences of arithmetic is undecidable}.
+  \item \textbf{Induction is not needed} to express rich computational properties — only to prove certain truths.
+\end{itemize}
+
+\subsection*{CR Prompt: Encoding Ideas into RA}
+
+Pick a relation like:
+
+\begin{enumerate}
+  \item “\( x \) is even” — \( \exists y(x = y + y) \)
+  \item “\( x < y \)” — \( \exists z(x + s(z) = y) \)
+  \item “\( x \) is prime” — Use universal quantification over divisors
+\end{enumerate}
+
+Try writing these relations as \( \exists \Delta_0 \) formulas in the language \( \mathcal{L}_A \). Which ones are representable in RA? How do you know?
+
+% Continued in next response
+\section{The MAIN LEMMA: Provability of Bounded Sentences in RA}
+
+\subsection{Goal and Strategy}
+
+\textbf{Goal:} Prove that if a bounded sentence \( A \) is true in the standard model \( \mathbb{N} \), then:
+
+\[
+TA \vdash A \quad \text{and hence} \quad RA \vdash A
+\]
+
+This tells us that bounded truths — those with limited quantifier scope — can be fully captured within RA.
+
+\textbf{Definition (Bounded Sentence):} A sentence is \textbf{bounded} if all of its quantifiers are of the form:
+
+\[
+\forall x \leq t \quad \text{or} \quad \exists x \leq t
+\]
+
+where \( t \) is a term in the language \( \mathcal{L}_A \), and \( x \) does not appear in \( t \).
+
+\subsubsection*{Examples}
+
+\begin{itemize}
+  \item Bounded: \( \forall x \leq s(s0)\, \exists y \leq x\, (x = y + y) \)
+  \item Not bounded: \( \forall x\, \exists y\, (x = y + y) \)
+\end{itemize}
+
+\textbf{Intuition:} Bounded quantification means we can “unroll” the formula into a finite check.
+
+\subsection{Expanding the Language: \( \mathcal{L}_{A,\leq} \)}
+
+To simplify reasoning about bounded quantifiers, we extend our language by adding a primitive symbol \( \leq \).
+
+\[
+\mathcal{L}_{A,\leq} = \mathcal{L}_A \cup \{ \leq \}
+\]
+
+Then we define a companion theory:
+
+\[
+RA_\leq = RA \cup \{ P0 \}
+\]
+
+Where:
+
+\[
+\textbf{P0: } \forall x\, \forall y\, (x \leq y \leftrightarrow \exists z(x + z = y))
+\]
+
+\subsubsection*{Translation Lemma (Semantic Equivalence)}
+
+Let \( A \) be any formula over \( \mathcal{L}_{A,\leq} \), and let \( A' \) be the formula in \( \mathcal{L}_A \) obtained by replacing each instance of \( t_1 \leq t_2 \) with \( \exists z(t_1 + z = t_2) \), where \( z \) is fresh.
+
+Then:
+
+\[
+RA_\leq \vdash A \iff RA \vdash A'
+\]
+
+This allows us to freely work in \( \mathcal{L}_{A,\leq} \) with \( \leq \) as a primitive, knowing that every result is still valid in the original theory after translation.
+
+\subsection{Proof of the MAIN LEMMA}
+
+We proceed by \textbf{induction on the complexity} (number of connectives and quantifiers) of the bounded sentence \( A \). Prior to that, we normalize \( A \) into negation-normal form.
+
+\subsubsection*{Negation Normalization}
+
+Drive all negations inward using:
+
+\begin{align*}
+\neg \neg A &\equiv A \\
+\neg (\forall x \leq t)\, B(x) &\equiv \exists x \leq t\, \neg B(x) \\
+\neg (\exists x \leq t)\, B(x) &\equiv \forall x \leq t\, \neg B(x)
+\end{align*}
+
+Thus, every sentence is equivalent to one built from atomic formulas and connectives \( \wedge, \vee \), and bounded quantifiers.
+
+\subsection{Base Case: Atomic Formulas}
+
+There are four atomic sentence types in \( \mathcal{L}_{A,\leq} \):
+
+\begin{itemize}
+  \item \( t = u \)
+  \item \( t \neq u \)
+  \item \( t \leq u \)
+  \item \( \neg(t \leq u) \)
+\end{itemize}
+
+Let us establish RA-provability of true instances of each.
+
+\subsubsection*{Lemma A1: Arithmetic of Numerals}
+
+Let \( m,n \in \mathbb{N} \). Then:
+
+\[
+RA \vdash s^m + s^n = s^{m+n}, \quad RA \vdash s^m \cdot s^n = s^{m \cdot n}
+\]
+
+\textbf{Proof:} By induction outside the system using Axioms P3–P6.
+
+\subsubsection*{Lemma A: Term Equality for Closed Terms}
+
+Let \( t \) be a closed term (no variables) such that its standard interpretation is \( s^n \). Then:
+
+\[
+RA \vdash t = s^n
+\]
+
+\textbf{Proof:} Structural induction on the term \( t \), applying Lemma A1.
+
+\subsubsection*{Lemma B: Inequality of Distinct Numerals}
+
+If \( m < n \), then:
+
+\[
+RA \vdash s^n \neq s^m
+\]
+
+\textbf{Proof:} Induction on \( m \), using Axioms P1 (successor not 0) and P2 (injectivity of \( s \)).
+
+\subsubsection*{Lemma C: Bounded Enumeration of Numerals}
+
+For all \( n \in \mathbb{N} \):
+
+\[
+RA_\leq \vdash \forall x\ (x \leq s^n \rightarrow (x = 0 \vee x = s(0) \vee \dots \vee x = s^n))
+\]
+
+\textbf{Proof:} Induction on \( n \) using P7 and P8.
+
+\vspace{0.5em}
+
+These lemmas suffice to handle atomic formulas and negated atomic formulas.
+
+\subsection{Inductive Step: Connective Cases}
+
+Suppose \( A = B \wedge C \) or \( A = B \vee C \). Since both \( B \) and \( C \) are simpler, we apply the induction hypothesis:
+
+\[
+RA \vdash B, \quad RA \vdash C \Rightarrow RA \vdash B \wedge C
+\]
+
+\textbf{Trivial for conjunction and disjunction.}
+
+\subsection{Inductive Step: Quantifier Cases}
+
+Suppose:
+
+\[
+A = \forall x \leq t\, B(x)
+\]
+
+Let \( t \) be a closed term; then by Lemma A, \( RA \vdash t = s^n \). So we reduce to proving:
+
+\[
+RA_\leq \vdash \forall x\ (x \leq s^n \rightarrow B(x))
+\]
+
+\textbf{Idea:} Show that:
+
+\[
+RA \vdash B(0), B(1), \dots, B(n)
+\Rightarrow RA \vdash \forall x \leq s^n\, B(x)
+\]
+
+By Lemma C and substitution properties.
+
+\subsubsection*{Case: Existential Bounded Quantifier}
+
+If \( A = \exists x \leq t\, B(x) \), and some instance \( B(k) \) is true for \( k \leq n \), then by the induction hypothesis:
+
+\[
+RA \vdash B(k)
+\Rightarrow RA \vdash \exists x \leq t\, B(x)
+\]
+
+(We’ll formalize this equivalence shortly.)
+
+\subsection*{Conclusion: MAIN LEMMA}
+
+If \( A \) is a true bounded sentence in the standard model, then:
+
+\[
+RA \vdash A
+\]
+
+\qed
+
+\subsection*{CR Prompt: What's Outside the MAIN LEMMA?}
+
+Construct a true sentence that is not bounded, such as:
+
+\[
+\forall x\, \exists y\, (x < y \wedge \text{Prime}(y))
+\]
+
+Why doesn’t the MAIN LEMMA apply? Can you bound the quantifiers somehow to fall under the lemma’s reach?
+
+\subsection{Corollaries}
+
+\begin{description}
+  \item[Corollary 1.] The set of bounded sentences of \( TA \) is decidable.
+  \item[Corollary 2.] Every true \( \exists \Delta_0 \) sentence is provable in RA.
+  \item[Corollary 3.] The set of \( \exists \Delta_0 \) theorems of RA is r.e.
+\end{description}
+
+\subsection*{AS Anchor: Concept Stack Summary}
+
+\begin{itemize}
+  \item \textbf{Bounded sentence:} All quantifiers are bounded by terms.
+  \item \textbf{Translation Lemma:} Eliminates \( \leq \) via encoding.
+  \item \textbf{MAIN LEMMA:} All true bounded sentences are provable in RA.
+  \item \textbf{Engine for:} RA Representation Theorem, Church's Theorem, Undecidability.
+\end{itemize}
+
+% Continued in next response
+\section{Formal Proof: RA Representation Theorem}
+
+\subsection{Theorem (RA Representation Theorem)}
+
+\textbf{Statement:} Every recursively enumerable (r.e.) relation \( R(\vec{x}) \) is representable in RA by an \( \exists \Delta_0 \) formula.
+
+That is, there exists a bounded formula \( B(\vec{x}, y) \) such that:
+
+\[
+\forall \vec{a} \in \mathbb{N}^n: \quad R(\vec{a}) \iff RA \vdash \exists y\, B(s\vec{a}, y)
+\]
+
+\subsection{Proof}
+
+\textbf{Step 1: Exists-Delta Theorem (from prior work)}
+
+Since \( R(\vec{x}) \) is r.e., there exists a bounded formula \( B(\vec{x}, y) \) such that:
+
+\[
+\forall \vec{a} \in \mathbb{N}^n: \quad R(\vec{a}) \iff TA \vdash \exists y\, B(s\vec{a}, y)
+\]
+
+\textbf{Step 2: Apply MAIN LEMMA}
+
+If \( R(\vec{a}) \) holds, then \( \exists y\, B(s\vec{a}, y) \in TA \). Since \( \exists y\, B(s\vec{a}, y) \) is an \( \exists \Delta_0 \) formula (bounded), we conclude:
+
+\[
+RA \vdash \exists y\, B(s\vec{a}, y)
+\]
+
+\textbf{Step 3: Definition of Representability}
+
+By definition, \( \exists y\, B(\vec{x}, y) \) represents \( R(\vec{x}) \) in RA.
+
+\qed
+
+\subsection*{CR Prompt: Turing Machines in RA?}
+
+Try designing a formula \( B(e, x, y) \) to encode: “Turing machine \( e \) halts on input \( x \) in \( y \) steps.”
+
+Can you write this as an \( \exists \Delta_0 \) formula? How would you express the step-by-step transitions?
+
+\subsection{From Representability to Undecidability}
+
+We now generalize our conclusions to arbitrary sound extensions of RA.
+
+\subsubsection*{Corollary: Every Sound Extension of RA is Undecidable}
+
+Let \( \Sigma \supseteq RA \) be sound.
+
+Let \( R(x) = K(x) \) be the halting problem (r.e.). Then by the RA Representation Theorem:
+
+\[
+\exists y\, A(x, y) \text{ represents } R(x) \text{ in } \Sigma
+\]
+
+That is:
+
+\[
+x \in K \iff \Sigma \vdash \exists y\, A(sx, y)
+\]
+
+Let \( f(x) = \#\exists y\, A(sx, y) \). Then \( f \) is computable. Hence:
+
+\[
+x \in K \iff f(x) \in \Sigma^\wedge
+\]
+
+So the halting problem reduces to the set of theorems of \( \Sigma \). Therefore, \( \Sigma \) is undecidable.
+
+\qed
+
+\subsection{Church's Theorem (General Form)}
+
+\textbf{Statement:} The set \( \texttt{VALID} \) of all valid sentences in the language \( \mathcal{L}_A \) is undecidable.
+
+\textbf{Proof:} Let \( \gamma = P1 \wedge \dots \wedge P9 \). Then for any sentence \( A \in \mathcal{L}_A \):
+
+\[
+RA \vdash A \iff (\gamma \rightarrow A) \text{ is valid}
+\]
+
+Thus, deciding validity would allow us to decide RA, which is undecidable. Hence, \( \texttt{VALID} \) is undecidable.
+
+\qed
+
+\subsection*{AS Anchor: Logical Landscape Recap}
+
+\begin{itemize}
+  \item \textbf{RA can represent any r.e. relation.}
+  \item \textbf{Any sound extension of RA is undecidable.}
+  \item \textbf{Validity over arithmetic is undecidable.}
+  \item \textbf{RA is still a finite theory (no induction).}
+\end{itemize}
+
+\subsection*{CR Prompt: What if RA Were Decidable?}
+
+Imagine a world where RA \textit{is} decidable. Could you then decide the halting problem? Construct a path of reasoning that leads to a contradiction.
+
+% Continued in next response
+\section{Strong Representability and the Main Undecidability Theorem}
+
+\subsection{Definition: Strong Representability}
+
+Let \( \Sigma \) be a theory and \( R(\vec{x}) \subseteq \mathbb{N}^n \). A formula \( A(\vec{x}) \) \textbf{strongly represents} \( R \) in \( \Sigma \) if:
+
+\begin{align*}
+&\forall \vec{a} \in \mathbb{N}^n: \\
+&\quad R(\vec{a}) \Rightarrow \Sigma \vdash A(s\vec{a}) \\
+&\quad \neg R(\vec{a}) \Rightarrow \Sigma \vdash \neg A(s\vec{a})
+\end{align*}
+
+\textbf{Remarks:}
+
+\begin{itemize}
+  \item This is a stronger condition than ordinary representability.
+  \item If \( \Sigma \) is consistent, then strong representability implies representability.
+  \item The converse holds only if \( \Sigma \) is complete.
+\end{itemize}
+
+\subsection{Strong RA Representation Theorem}
+
+\textbf{Theorem:} Every \textbf{recursive} relation \( R(\vec{x}) \) is strongly representable in RA by a formula of the form:
+
+\[
+A(\vec{x}) = \exists y \left[ B_1(\vec{x}, y) \wedge \forall z \leq y\, \neg B_2(\vec{x}, z) \right]
+\]
+
+Where \( B_1 \) and \( B_2 \) are bounded formulas representing \( R \) and \( \neg R \), respectively.
+
+\subsection{Proof}
+
+Let \( R(\vec{x}) \) be recursive. Then both \( R \) and \( \neg R \) are r.e.
+
+So:
+
+\begin{itemize}
+  \item There exists a \( \Delta_0 \) formula \( B_1(\vec{x}, y) \) representing \( R \)
+  \item There exists a \( \Delta_0 \) formula \( B_2(\vec{x}, z) \) representing \( \neg R \)
+\end{itemize}
+
+Define:
+
+\[
+A(\vec{x}) := \exists y\, [ B_1(\vec{x}, y) \wedge \forall z \leq y\, \neg B_2(\vec{x}, z) ]
+\]
+
+\subsubsection*{Case 1: \( R(\vec{a}) \) is true}
+
+Then \( B_1(s\vec{a}, sb) \in TA \) for some \( b \). Since \( \neg R(\vec{a}) \) is false, we know:
+
+\[
+\forall z \leq sb\ \neg B_2(s\vec{a}, z) \in TA
+\]
+
+By the MAIN LEMMA, both parts are provable in RA. Therefore:
+
+\[
+RA \vdash A(s\vec{a})
+\]
+
+\subsubsection*{Case 2: \( \neg R(\vec{a}) \) is true}
+
+Then \( B_2(s\vec{a}, sc) \in TA \) for some \( c \)
+
+By P9: \( \forall y\ (y \leq sc \vee sc \leq y) \in RA \)
+
+We break into cases:
+
+\begin{itemize}
+  \item If \( y \leq sc \), then \( B_2(s\vec{a}, y) \) is true for some \( y \). So the negation of \( \forall z \leq y\, \neg B_2(s\vec{a}, z) \) holds.
+  \item If \( sc \leq y \), then \( \exists z \leq y\, B_2(s\vec{a}, z) \) is provable in RA
+\end{itemize}
+
+Hence:
+
+\[
+RA \vdash \neg A(s\vec{a})
+\]
+
+\qed
+
+\subsection*{AS Anchor: Representation Notions Compared}
+
+\begin{itemize}
+  \item \textbf{Representability:} \( R(\vec{a}) \Rightarrow \Sigma \vdash A(s\vec{a}) \)
+  \item \textbf{Strong Representability:} Add \( \neg R(\vec{a}) \Rightarrow \Sigma \vdash \neg A(s\vec{a}) \)
+  \item Strong representability implies full syntactic alignment between truth and provability
+\end{itemize}
+
+\subsection*{CR Prompt: Build a Strong Representation}
+
+Try explicitly building \( A(x) \) that strongly represents the relation:
+
+\[
+R(x) := \text{"\( x \) is even"}
+\Rightarrow \exists y(x = y + y)
+\]
+
+Write \( A(x) := \exists y[ x = y + y \wedge \forall z \leq y\, x \neq z + z + 1 ] \)
+
+Can you justify why this meets both directions of strong representability?
+
+\subsection{Undecidability Theorem (General Form)}
+
+\textbf{Theorem:} If every recursive relation is representable in \( \Sigma \), then \( \Sigma \) is undecidable.
+
+\subsubsection*{Proof Strategy (Diagonalization)}
+
+Suppose \( \Sigma \) is recursive. Then:
+
+\[
+\text{Define } R(x) := \text{“x is the code of a formula not provable in } \Sigma \text{”}
+\]
+
+Then \( R \) is recursive. Let \( A(x) \) represent \( R(x) \) in \( \Sigma \)
+
+Let \( e = \#A(x) \), and define:
+
+\[
+S(x) := \neg R(d(x)) \quad \text{where } d(x) = \#A(sx)
+\]
+
+By construction, we derive a contradiction akin to Gödel’s theorem. Hence \( \Sigma \) is not recursive.
+
+\qed
+
+\subsection{Main Theorem: Every Consistent Extension of RA is Undecidable}
+
+\textbf{Proof:}
+
+Let \( \Sigma \supseteq RA \) be consistent. Let \( R(\vec{x}) \) be recursive. Then:
+
+\[
+\text{Strong RA Representation Theorem} \Rightarrow A(\vec{x}) \text{ strongly represents } R \text{ in RA}
+\]
+
+Then \( A \) represents \( R \) in every consistent extension of RA, including \( \Sigma \)
+
+\[
+\Rightarrow \text{By the Undecidability Theorem, } \Sigma \text{ is undecidable}
+\]
+
+\qed
+
+\subsection*{AS–CR Reflection: Why This Matters}
+
+This result shows that the limit is not about \emph{truth}, but about \emph{structure}. Even weak, syntactically defined theories like RA generate undecidability when they encode the arithmetic of computation.
+
+\subsection*{CR Prompt: Make Your Own Theory}
+
+Try defining a new theory \( \Sigma \) by adding a (false) axiom to RA, like:
+
+\[
+\Sigma = RA + \text{“There are only finitely many primes”}
+\]
+
+Is \( \Sigma \) consistent? What does the Main Theorem say about its decidability?
+
+% Continued in next response
+\section{Nonstandard Models and the Separation of RA and PA}
+
+\subsection{Motivation}
+
+The previous sections have shown that:
+
+\begin{itemize}
+  \item RA is a finite, weak theory
+  \item PA is a strictly stronger theory (includes induction)
+  \item But we haven't yet proven that \( RA \neq PA \)
+\end{itemize}
+
+We now provide a \textbf{model-theoretic separation}: we construct a model that satisfies all axioms of RA, but fails a sentence provable in PA. This proves:
+
+\[
+RA \neq PA
+\]
+
+\subsection{The Structure \( \mathbb{Z}[X]^+ \)}
+
+Let:
+
+\[
+\mathbb{Z}[X]^+ = \{ p(X) \in \mathbb{Z}[X] \mid p = 0 \text{ or leading coefficient of } p > 0 \}
+\]
+
+\textbf{Universe:} All integer-coefficient polynomials with either:
+\begin{itemize}
+  \item Zero polynomial
+  \item Leading coefficient positive
+\end{itemize}
+
+\textbf{Operations:}
+
+\begin{itemize}
+  \item \( + \): polynomial addition
+  \item \( \cdot \): polynomial multiplication
+  \item \( s(p(X)) := p(X) + 1 \)
+  \item \( 0 := \) the zero polynomial
+\end{itemize}
+
+This defines a structure over the language \( \mathcal{L}_A = \{0, s, +, \cdot; =\} \)
+
+\subsection{Claim: \( \mathbb{Z}[X]^+ \models RA \)}
+
+We must verify axioms P1–P9.
+
+\begin{description}
+  \item[P1:] \( s(p) = p + 1 \neq 0 \) for all \( p \in \mathbb{Z}[X]^+ \) \\
+  If \( p + 1 = 0 \), then \( p = -1 \notin \mathbb{Z}[X]^+ \), since its leading coefficient is negative.
+
+  \item[P2:] \( s(p) = s(q) \Rightarrow p + 1 = q + 1 \Rightarrow p = q \)
+
+  \item[P3–P6:] Arithmetic is standard and obeys recursive definitions.
+
+  \item[P7–P9:] Use the syntactic definition of \( \leq \): \( p \leq q \iff \exists r(p + r = q) \). This holds due to closure of \( \mathbb{Z}[X]^+ \) under addition.
+\end{description}
+
+\subsection{Sentence That Separates PA and RA}
+
+Define:
+
+\[
+A := \exists x\, \forall y\, [x \neq y + y \wedge x \neq y + y + s(0)]
+\]
+
+\textbf{Interpretation:} “There exists a number \( x \) that is neither even nor odd.”
+
+This is \textbf{false in \( \mathbb{N} \)}, so:
+
+\[
+PA \vdash \neg A \quad \text{(provable by induction)}
+\]
+
+However, in \( \mathbb{Z}[X]^+ \):
+
+\begin{itemize}
+  \item Let \( x = X \in \mathbb{Z}[X]^+ \)
+  \item For any polynomial \( y \), \( y + y = 2y \), and \( y + y + 1 = 2y + 1 \)
+  \item So \( X \neq 2y \), and \( X \neq 2y + 1 \), because their degrees differ
+\end{itemize}
+
+Hence:
+
+\[
+\mathbb{Z}[X]^+ \models A
+\Rightarrow A \notin RA
+\]
+
+\textbf{Therefore:}
+\[
+RA \not\vdash \neg A, \quad \text{but } PA \vdash \neg A
+\Rightarrow RA \neq PA
+\qed
+\]
+
+\subsection{Corollary: RA and PA Have Different Models}
+
+\textbf{RA} has “exotic” models like \( \mathbb{Z}[X]^+ \)
+
+\textbf{PA} forces models to behave like \( \mathbb{N} \) at the level of induction — even if they are nonstandard in size or structure.
+
+\subsection*{AS Anchor: Semantic View of Theories}
+
+\begin{itemize}
+  \item \textbf{PA:} All models satisfy induction — eliminates certain counterexamples
+  \item \textbf{RA:} More permissive — satisfied by wider class of structures
+  \item \textbf{Model-theoretic separation:} One sentence provable in PA, but not in RA
+\end{itemize}
+
+\subsection*{CR Prompt: Build a Fake Arithmetic}
+
+Try defining a model like \( \mathbb{Z}[X]^+ \) with strange properties. For example:
+
+\begin{itemize}
+  \item Use matrices or functions as numbers
+  \item Define “successor” as adding a fixed function
+  \item What RA axioms hold? What PA sentences fail?
+\end{itemize}
+
+\textbf{Challenge:} Can you build a consistent model of RA in which some basic arithmetic truths from \( \mathbb{N} \) fail?
+
+% Continued in next response
+\section{Synthesis: The Structure of Arithmetic Theories}
+
+\subsection{Axiomatizability, Consistency, and Completeness}
+
+Let \( \Sigma \) be a theory over the language \( \mathcal{L}_A \). Consider the following properties:
+
+\begin{description}
+  \item[Axiomatizable:] \( \Sigma \) is recursively enumerable
+  \item[Sound:] All theorems of \( \Sigma \) are true in \( \mathbb{N} \)
+  \item[Complete:] For every sentence \( A \), either \( \Sigma \vdash A \) or \( \Sigma \vdash \neg A \)
+  \item[Decidable:] There is an algorithm to decide whether \( A \in \Sigma \)
+\end{description}
+
+\subsection{The Hierarchy of Results}
+
+\begin{enumerate}[label=\textbf{T\arabic*.}]
+  \item \textbf{(Gödel’s First Incompleteness)}  
+  If \( \Sigma \) is sound, axiomatizable, and contains PA, then it is incomplete.
+
+  \item \textbf{(Gödel’s Second Incompleteness)}  
+  Such a \( \Sigma \) cannot prove its own consistency.
+
+  \item \textbf{(Church’s Theorem)}  
+  The set of valid sentences in \( \mathcal{L}_A \) is undecidable.
+
+  \item \textbf{(RA Representation Theorem)}  
+  Every r.e. relation is representable in RA by an \( \exists \Delta_0 \) formula.
+
+  \item \textbf{(Strong RA Representation Theorem)}  
+  Every recursive relation is strongly representable in RA.
+
+  \item \textbf{(Main Undecidability Theorem)}  
+  Every consistent extension of RA is undecidable.
+
+  \item \textbf{(Separation Theorem)}  
+  There exist sentences (e.g., \( \neg A \)) provable in PA but not in RA.
+\end{enumerate}
+
+\subsection{Diagram: Semantic vs Syntactic Boundaries}
+
+\vspace{1em}
+\textbf{Semantic Truths} (TA)\\
+\hspace{2em}$\searrow$ provable bounded fragment\\
+\hspace{3em}$\swarrow$\\
+\textbf{RA}\\
+\hspace{1em}$\hookrightarrow$ finitely axiomatized, undecidable, incomplete\\
+\hspace{2em}$\searrow$\\
+\textbf{PA}\\
+\hspace{1em}$\hookrightarrow$ axiomatizable, undecidable, incomplete\\
+\hspace{2em}$\searrow$\\
+\textbf{Sound Extensions of PA}\\
+\hspace{1em}$\hookrightarrow$ still incomplete by Gödel 2\\
+\vspace{1em}
+
+\subsection*{AS Summary Table: Theory Properties}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Theory} & \textbf{Finitely Axiomatized} & \textbf{Decidable} & \textbf{Complete} & \textbf{Sound} \\
+\hline
+RA & Yes & No & No & Yes (in \( \mathbb{N} \)) \\
+PA & No & No & No & Yes \\
+TA & N/A & N/A & Yes & Yes \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection*{CR Prompt: Build the Boundary}
+
+Suppose you define a theory \( \Sigma := RA + A \) for some undecidable sentence \( A \notin RA \). Can you make \( \Sigma \) consistent but incomplete? What are its models?
+
+Try this for different kinds of \( A \):
+\begin{itemize}
+  \item A sentence false in \( \mathbb{N} \)
+  \item A sentence true but not provable in RA
+  \item A sentence unprovable in PA (if one exists)
+\end{itemize}
+
+\section{Exercises for Mastery and Discovery}
+
+\subsection{Abstract Sequential (AS) Exercises}
+
+\begin{enumerate}[label=\textbf{A\arabic*.}]
+  \item Prove that RA proves the commutativity of addition: \( x + y = y + x \). State which axioms you use.
+  \item Use the Induction Schema to prove:  
+    \( PA \vdash x \cdot (y + z) = x \cdot y + x \cdot z \)
+  \item Translate the sentence \( x \leq y \rightarrow x = y \) into pure \( \mathcal{L}_A \) and prove/disprove it in RA.
+  \item Prove Lemma C: \( \forall x(x \leq s^n \rightarrow x = 0 \vee x = 1 \vee \dots \vee x = s^n) \)
+  \item Show that each of P7, P8, and P9 can be proved in PA using induction.
+\end{enumerate}
+
+\subsection{Concrete Random (CR) Explorations}
+
+\begin{enumerate}[label=\textbf{D\arabic*.}]
+  \item Construct a nonstandard model of RA using:
+    \begin{itemize}
+      \item Matrices with non-negative integer entries
+      \item Successor defined as \( M \mapsto M + I \)
+      \item Addition and multiplication as matrix ops
+    \end{itemize}
+    Which axioms hold? Which fail?
+
+  \item Try creating a bounded formula \( B(x, y) \) that encodes:
+    \textit{“y is the smallest prime factor of x”}  
+    Can you express this entirely in \( \Delta_0 \) notation?
+
+  \item Write a program that takes a sentence in \( \mathcal{L}_A \) and checks whether it is syntactically bounded. Then auto-generate brute-force proofs for the first 20 true bounded sentences.
+
+  \item Explore the theory \( \text{Th}(\mathbb{Q}^+) \) under \( s(x) = x + 1 \), with rational numbers. Which RA axioms hold?
+
+  \item Invent your own symbolic arithmetic universe using ASCII strings:
+    \begin{itemize}
+      \item “0” := empty string
+      \item “s” := string concatenation
+      \item “+” := string doubling
+    \end{itemize}
+    Define an RA-like theory. What kind of arithmetic emerges?
+\end{enumerate}
+
+\section*{Closing Note}
+
+The study of RA and PA is not only about arithmetic — it is a deep probe into the limits of formal reasoning, the boundary between computation and logic, and the architecture of provability. You have now traversed a complete ladder:
+
+\[
+\text{Computation} \rightarrow \text{Arithmetic} \rightarrow \text{Proof Theory} \rightarrow \text{Metamathematics}
+\]
+
+There is much more to explore. And your tools — structure and curiosity — are exactly what’s needed to go further.
+
+\end{document}

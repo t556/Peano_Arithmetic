@@ -1,0 +1,143 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codeblue}{rgb}{0,0,0.8}
+
+\lstdefinestyle{cppstyle}{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codeblue}\bfseries,
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codegray},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\lstset{style=cppstyle}
+
+\title{Recursive Functions in C++ with Pointers and Structs}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document provides examples and exercises in C++ designed to help you familiarize yourself with recursive functions while incorporating pointers and structs. The examples are organized step-by-step for clarity, and the exercises are open-ended to encourage exploration and deeper understanding. This approach has been tailored for an AS/CR type learner, focusing both on logical sequencing and creative problem-solving.
+
+\section{Basic Examples}
+
+\subsection{Recursive Factorial Function}
+A classic example of recursion is computing the factorial of a number. Although this example does not involve pointers or structs, it introduces the basic recursive mindset.
+
+\begin{lstlisting}
+#include <iostream>
+using namespace std;
+
+int factorial(int n) {
+    if(n <= 1)
+        return 1;  // Base case: factorial(0) = factorial(1) = 1
+    return n * factorial(n - 1);
+}
+
+int main(){
+    int number = 5;
+    cout << "Factorial of " << number << " is " << factorial(number) << endl;
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Recursive Linked List Length with Pointers and Structs}
+This example shows how to define a simple linked list using a struct and calculate its length recursively.
+
+\begin{lstlisting}
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+int listLength(Node* head) {
+    if(head == nullptr)
+        return 0;  // Base case: reached the end of the list
+    return 1 + listLength(head->next);
+}
+
+int main(){
+    // Creating a simple linked list: 1 -> 2 -> 3 -> nullptr
+    Node n3 = {3, nullptr};
+    Node n2 = {2, &n3};
+    Node n1 = {1, &n2};
+
+    cout << "Linked list length: " << listLength(&n1) << endl;
+    return 0;
+}
+\end{lstlisting}
+
+\section{Exercises}
+
+\subsection{Exercise 1: Recursive Fibonacci Function}
+\textbf{Task:} Write a recursive function that computes the \( n \)th Fibonacci number.
+
+\textbf{Hints:}
+\begin{itemize}
+    \item Use the base cases: Fibonacci(0) = 0 and Fibonacci(1) = 1.
+    \item For \( n > 1 \), define Fibonacci(n) as Fibonacci(n-1) + Fibonacci(n-2).
+    \item Experiment with optimizations such as tail recursion or memoization if you feel adventurous.
+\end{itemize}
+
+\subsection{Exercise 2: Print a Linked List in Reverse Order}
+\textbf{Task:} Extend the linked list example. Write a recursive function that prints the elements of a linked list in reverse order.
+
+\textbf{Hints:}
+\begin{itemize}
+    \item First, traverse to the end of the list recursively.
+    \item Then, print each node’s data on the way back up the recursive calls.
+    \item This exercise reinforces both recursion and pointer manipulation.
+\end{itemize}
+
+\subsection{Exercise 3: Binary Tree Height and Inorder Traversal}
+\textbf{Task:} Define a binary tree using structs and pointers. Implement two recursive functions:
+\begin{enumerate}
+    \item One to compute the height of the tree.
+    \item One to perform an inorder traversal (left-root-right) of the tree.
+\end{enumerate}
+
+\textbf{Hints:}
+\begin{itemize}
+    \item For the height function, use the base case of an empty node (return 0) and compute the height as \( 1 + \max(\text{height of left, height of right}) \).
+    \item For inorder traversal, recursively visit the left subtree, print the current node’s value, then visit the right subtree.
+    \item This exercise helps you understand recursion in hierarchical data structures.
+\end{itemize}
+
+\subsection{Exercise 4: Recursive Reversal of a Linked List}
+\textbf{Task:} Write a recursive function that reverses a singly linked list in place.
+
+\textbf{Hints:}
+\begin{itemize}
+    \item Consider the base case when the list is empty or contains only one node.
+    \item Use pointer manipulation carefully to change the direction of the links.
+    \item This exercise deepens your understanding of pointers and recursion.
+\end{itemize}
+
+\section{Final Thoughts}
+These examples and exercises are structured to offer a logical progression and creative challenges. By working through these problems, you'll develop both a theoretical and practical understanding of recursion in C++ with pointers and structs.
+
+\end{document}

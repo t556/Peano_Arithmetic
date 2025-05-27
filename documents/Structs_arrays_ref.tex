@@ -1,0 +1,196 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\definecolor{codebg}{rgb}{0.95,0.95,0.92}
+\lstset{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!40!black},
+  numbers=left,
+  numberstyle=\tiny,
+  breaklines=true,
+  captionpos=b
+}
+
+\title{Quick Reference: Structs, Pointers, Arrays, and Memory in C/C++}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Structs: Grouping Data}
+
+A \texttt{struct} groups related variables under one name.
+
+\begin{lstlisting}[language=C++]
+struct Point {
+    int x;
+    int y;
+};
+\end{lstlisting}
+
+\textbf{AS Syntax Pattern:}
+\begin{itemize}
+    \item Declare with \texttt{struct Name \{...\};}
+    \item Use with \texttt{Point p; p.x = 10;}
+\end{itemize}
+
+\textbf{CR Visual:} Like a labeled box holding related slots: \texttt{x | y}
+
+\vspace{0.5em}
+\textbf{Bonus — C++ Style Struct with Constructor:}
+
+\begin{lstlisting}[language=C++]
+struct Point {
+    int x, y;
+    Point(int x_, int y_) : x(x_), y(y_) {}
+};
+\end{lstlisting}
+
+\section*{Pointers: Memory Addresses}
+
+A pointer \textit{stores the memory address} of a variable.
+
+\begin{lstlisting}[language=C++]
+int a = 42;
+int* ptr = &a;     // ptr points to a
+std::cout << *ptr; // dereference = 42
+\end{lstlisting}
+
+\textbf{AS Cheat Sheet:}
+\begin{itemize}
+    \item \texttt{*} declares a pointer: \texttt{int* p;}
+    \item \texttt{\&} gets the address: \texttt{\&x}
+    \item \texttt{*p} dereferences the pointer (gets the value)
+\end{itemize}
+
+\textbf{CR Visual:} \texttt{ptr → [42]} — like a cable connecting to a memory slot.
+
+\section*{Arrays and Pointers}
+
+\begin{lstlisting}[language=C++]
+int arr[3] = {1, 2, 3};
+int* p = arr;        // arr == &arr[0]
+std::cout << p[1];   // prints 2
+\end{lstlisting}
+
+\textbf{Arrays decay to pointers.} You can treat the name of the array as a pointer.
+
+\section*{Passing Pointers to Functions}
+
+\textbf{Why:} Let a function access/modify the original variable or structure.
+
+\begin{lstlisting}[language=C++]
+void increment(int* x) {
+    (*x)++;
+}
+
+int main() {
+    int val = 10;
+    increment(&val);  // pass pointer
+    std::cout << val; // prints 11
+}
+\end{lstlisting}
+
+\textbf{AS Tip:}
+\begin{itemize}
+    \item Passing by pointer lets you modify values in-place
+\end{itemize}
+
+\textbf{CR Analogy:} You gave the function your variable’s “address” — like handing over a key instead of a copy.
+
+\section*{Pointers to Structs}
+
+\begin{lstlisting}[language=C++]
+Point pt(2, 3);
+Point* ptr = &pt;
+std::cout << ptr->x; // use '->' for member access
+\end{lstlisting}
+
+\textbf{Syntax Rule:} Use \texttt{->} to access members from a pointer to a struct.
+
+\section*{Dynamic Memory: malloc/new}
+
+Allocate memory manually during runtime.
+
+\vspace{0.5em}
+\textbf{C Style:}
+
+\begin{lstlisting}[language=C]
+int* data = (int*)malloc(sizeof(int) * 10);
+data[0] = 42;
+free(data);
+\end{lstlisting}
+
+\vspace{0.5em}
+\textbf{C++ Style:}
+
+\begin{lstlisting}[language=C++]
+int* data = new int[10];
+data[0] = 42;
+delete[] data;
+\end{lstlisting}
+
+\textbf{For structs:}
+
+\begin{lstlisting}[language=C++]
+Point* p = new Point(5, 6); // constructor call
+delete p;
+\end{lstlisting}
+
+\textbf{Important: Always free what you allocate!}
+
+\section*{Memory Layout Insight (CR Mental Image)}
+
+Imagine RAM as a giant warehouse with numbered lockers.
+
+\begin{itemize}
+    \item \texttt{int x = 5;} puts 5 in locker \#1000 (example).
+    \item \texttt{int* p = \&x;} gives you the key to locker \#1000.
+    \item \texttt{*p = 7;} writes 7 in locker \#1000.
+\end{itemize}
+
+\textbf{For arrays and structs:} memory is continuous and packed.
+
+\section*{Putting It All Together: Node Chaining Example}
+
+\begin{lstlisting}[language=C++]
+struct Node {
+    std::string key;
+    int value;
+    Node* next;
+};
+
+Node* head = new Node{"key1", 123, nullptr};
+head->next = new Node{"key2", 456, nullptr};
+\end{lstlisting}
+
+\textbf{Memory layout:}
+\[
+\text{[head]} \rightarrow \text{[key1, 123]} \rightarrow \text{[key2, 456]} \rightarrow NULL
+\]
+
+This is the core of chained hash tables!
+
+\section*{Summary Cheatsheet}
+
+\begin{itemize}
+    \item \texttt{struct S \{ ... \};} defines a custom type
+    \item \texttt{S s;} or \texttt{S* sp = new S();}
+    \item \texttt{*p} = value pointed to; \texttt{\&x} = address of x
+    \item \texttt{malloc/free} = C style, \texttt{new/delete} = C++ style
+    \item Pass pointers to functions for in-place modification
+    \item Use \texttt{->} to access members via pointers
+    \item Arrays and pointers are deeply connected
+\end{itemize}
+
+\end{document}
